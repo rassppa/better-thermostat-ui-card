@@ -39,6 +39,22 @@ As for now the main improvement is the ability to see the extra status from bett
 | disable_buttons         | boolean  | **optional** | turn off the plus/minus buttons                                                                        |
 | name                | string/boolean  | **optional** | override the default entity name, us false to 
 
+## Example dashboard
+
+A complete, ready-to-paste dashboard (overview with quick actions and history graphs, one section per room with this card, and a battery view) is available in [`examples/dashboard.yaml`](examples/dashboard.yaml).
+
+1. Settings → Dashboards → **Add dashboard** → *New dashboard from scratch*
+2. Open it → **Edit** → ⋮ → **Raw configuration editor**
+3. Paste the file and replace the placeholder entity ids with your own
+
+Minimal card example:
+
+```yaml
+type: custom:better-thermostat-ui-card
+entity: climate.living_room
+eco_temperature: 18
+```
+
 ## Help wanted!
 
 It would be awsome if you help me to translate this card to other languages.

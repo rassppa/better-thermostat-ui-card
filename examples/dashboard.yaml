@@ -1,0 +1,220 @@
+# Example Home Assistant dashboard for Better Thermostat
+# ------------------------------------------------------
+# How to use:
+#   1. Install `better_thermostat` (>= 1.3.0) and this card (via HACS).
+#   2. Settings -> Dashboards -> Add dashboard -> "New dashboard from scratch".
+#   3. Open it, click the pencil (Edit) -> three dots -> "Raw configuration editor".
+#   4. Paste this file and replace the placeholder entity ids
+#      (climate.living_room, binary_sensor.living_room_window, ...) with your own.
+#
+# Only built-in cards plus `custom:better-thermostat-ui-card` are used,
+# so no other custom resources are required. Needs HA 2024.8 or newer
+# (sections view, heading card and tile features).
+
+title: Heating
+views:
+  # ---------------------------------------------------------------- Overview
+  - title: Overview
+    path: overview
+    icon: mdi:thermostat
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: All rooms
+            icon: mdi:home-thermometer
+          - type: tile
+            entity: climate.living_room
+            features:
+              - type: target-temperature
+          - type: tile
+            entity: climate.bedroom
+            features:
+              - type: target-temperature
+          - type: tile
+            entity: climate.kitchen
+            features:
+              - type: target-temperature
+          - type: tile
+            entity: climate.bathroom
+            features:
+              - type: target-temperature
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Quick actions
+            icon: mdi:gesture-tap
+          - type: button
+            name: All heat
+            icon: mdi:fire
+            tap_action:
+              action: perform-action
+              perform_action: climate.set_hvac_mode
+              data:
+                hvac_mode: heat
+              target:
+                entity_id: &all_thermostats
+                  - climate.living_room
+                  - climate.bedroom
+                  - climate.kitchen
+                  - climate.bathroom
+              confirmation:
+                text: Turn heating on in all rooms?
+          - type: button
+            name: All eco
+            icon: mdi:leaf
+            tap_action:
+              action: perform-action
+              perform_action: climate.set_preset_mode
+              data:
+                preset_mode: eco
+              target:
+                entity_id: *all_thermostats
+          - type: button
+            name: All off
+            icon: mdi:power
+            tap_action:
+              action: perform-action
+              perform_action: climate.set_hvac_mode
+              data:
+                hvac_mode: "off"
+              target:
+                entity_id: *all_thermostats
+              confirmation:
+                text: Turn heating off in all rooms?
+
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Temperature (last 24 h)
+            icon: mdi:chart-line
+          - type: history-graph
+            hours_to_show: 24
+            grid_options:
+              columns: full
+            entities:
+              - entity: sensor.living_room_temperature
+                name: Living room
+              - entity: sensor.bedroom_temperature
+                name: Bedroom
+              - entity: sensor.kitchen_temperature
+                name: Kitchen
+              - entity: sensor.bathroom_temperature
+                name: Bathroom
+          - type: history-graph
+            title: Windows
+            hours_to_show: 24
+            grid_options:
+              columns: full
+            entities:
+              - binary_sensor.living_room_window
+              - binary_sensor.bedroom_window
+              - binary_sensor.kitchen_window
+              - binary_sensor.bathroom_window
+
+  # ------------------------------------------------------------------ Rooms
+  - title: Rooms
+    path: rooms
+    icon: mdi:sofa
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Living room
+            icon: mdi:sofa
+          - type: custom:better-thermostat-ui-card
+            entity: climate.living_room
+            eco_temperature: 18
+            grid_options:
+              columns: full
+          - type: tile
+            entity: sensor.living_room_humidity
+            name: Humidity
+          - type: tile
+            entity: binary_sensor.living_room_window
+            name: Window
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bedroom
+            icon: mdi:bed
+          - type: custom:better-thermostat-ui-card
+            entity: climate.bedroom
+            eco_temperature: 16
+            grid_options:
+              columns: full
+          - type: tile
+            entity: sensor.bedroom_humidity
+            name: Humidity
+          - type: tile
+            entity: binary_sensor.bedroom_window
+            name: Window
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Kitchen
+            icon: mdi:stove
+          - type: custom:better-thermostat-ui-card
+            entity: climate.kitchen
+            eco_temperature: 17
+            disable_summer: true
+            grid_options:
+              columns: full
+          - type: tile
+            entity: sensor.kitchen_humidity
+            name: Humidity
+          - type: tile
+            entity: binary_sensor.kitchen_window
+            name: Window
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bathroom
+            icon: mdi:shower
+          - type: custom:better-thermostat-ui-card
+            entity: climate.bathroom
+            eco_temperature: 20
+            set_current_as_main: true
+            grid_options:
+              columns: full
+          - type: tile
+            entity: sensor.bathroom_humidity
+            name: Humidity
+          - type: tile
+            entity: binary_sensor.bathroom_window
+            name: Window
+
+  # ---------------------------------------------------------------- Battery
+  - title: Batteries
+    path: batteries
+    icon: mdi:battery
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: TRV batteries
+            icon: mdi:battery-heart-variant
+          - type: entities
+            grid_options:
+              columns: full
+            state_color: true
+            entities:
+              - entity: sensor.living_room_trv_battery
+                name: Living room
+              - entity: sensor.bedroom_trv_battery
+                name: Bedroom
+              - entity: sensor.kitchen_trv_battery
+                name: Kitchen
+              - entity: sensor.bathroom_trv_battery
+                name: Bathroom
